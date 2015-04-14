@@ -145,7 +145,42 @@ var dhtpayload = {
   "sig_user":"tschaul"
 };
 
+var dhtpayload_retwist = {
+  "p":{
+    "height":74156,
+    "seq":1,
+    "target":{
+      "n":"tschaul",
+      "r":"post33",
+      "t":"s"
+    },
+    "time":1423918977,
+    "v":{
+      "sig_userpost":"1fda418e4a54244ae3e697e4675cda753b55ef3d2a8eb0cbc2434f22d4de4715f2351a88b686cc7638ab05b99c83d5ef97e7ab828867d9cdfce8c7ce56ea08e199",
+      "userpost":{
+        "height":74156,
+        "k":33,
+        "lastk":32,
+        "n":"tschaul",
+        "rt":{
+          "height":74103,
+          "k":12952,
+          "lastk":12951,
+          "msg":"Http2 explained ⌘ https://news.ycombinator.com/item?id=9038613",
+          "n":"hn",
+          "time":1423895165
+        },
+        "sig_rt":"20d85c06e7a87468d80e4db33097911e22b007b5a269dc5cb17ffb8de565c1539bc68ee3eb4acf1625a2b1c7d80eba6f1ccf1985f24b475082bb121053f851c73e",
+        "time":1423918977
+      }
+    }
+  },
+  "sig_p":"1ff822982f8af6cf57c049f15d466faf8ce558bb3cb33cfb2253c4abebd225c92e27543949f84fe6b1dbc8bb2dfef1e657642b51bcb41e5f8295f2771924ed3d69",
+ "sig_user":"tschaul"
+};
+
 var pubkey_tschaul = "03bcd23141e46af2f8bccb0194b53e5df57752a47c263d0d005691cfed4f2511b8";
+var pubkey_hn = "03e12060d0b609bb6b35cfc0208de7f022f47ea5e971c2130bece35717380bad57";
 
 tschaulPubKey = TwisterCrypto.PubKey.fromHex(pubkey_tschaul);
 
@@ -155,6 +190,16 @@ if( !tschaulPubKey.messageVerify(Bencode.encode(dhtpayload.p), dhtpayload.sig_p)
 
 if( !tschaulPubKey.messageVerify(Bencode.encode(dhtpayload.p.v.userpost), dhtpayload.p.v.sig_userpost) ) {
   log("ERROR: verify for post in dht payload failed with the expected pubkey")
+}
+
+if( !tschaulPubKey.messageVerify(Bencode.encode(dhtpayload_retwist.p.v.userpost), dhtpayload_retwist.p.v.sig_userpost) ) {
+  log("ERROR: verify for retwisting post in dht payload failed with the expected pubkey")
+}
+
+hnPubKey = TwisterCrypto.PubKey.fromHex(pubkey_hn);
+
+if( !hnPubKey.messageVerify(Bencode.encode(dhtpayload_retwist.p.v.userpost.rt), dhtpayload_retwist.p.v.userpost.sig_rt) ) {
+  log("ERROR: verify for retwisted post in dht payload failed with the expected pubkey")
 }
 
 //sighex = new Buffer(sig).toString("hex")
