@@ -42,6 +42,7 @@ var signedpost =
 
 var signedpost_user_pubkey = "03bc75d34b1cb18646591567c441a4b7c35cf3fe37fd4cd8e6699b0c12ee11b9b4"
 
+
 function log(msg)
 {
   document.getElementById('myTextarea').value += "\n" + msg;
@@ -106,6 +107,54 @@ if( key.pub.messageVerify(userpost, signedpost["sig_userpost"]) ) {
 userPubKey = TwisterCrypto.PubKey.fromHex(signedpost_user_pubkey)
 if( !userPubKey.messageVerify(userpost, signedpost["sig_userpost"]) ) {
   log("ERROR: verify for userpost failed with the expected pubkey")
+}
+
+
+// DHT payload verify signature test
+//
+//
+//
+
+var dhtpayload = {
+  "p":{
+    "height":81729,
+    "seq":38,
+    "target":{
+      "n":"tschaul",
+      "r":"status",
+      "t":"s"
+    },
+    "time":1428653527,
+    "v":{
+      "sig_userpost":"1fd6d2b6f87d247f84dd18dae0fda5cdd867bba9d16a564222bf9d3e7fbc2c761cc828c3e0667284b265cb1ea19c82ef6b96517b5b39989184861c8f32897e6cfa",
+      "userpost":{
+        "height":81729,
+        "k":38,
+        "lastk":35,
+        "msg":"@arco That looks really nice!",
+        "n":"tschaul",
+        "reply":{
+          "k":37,
+          "n":"arco"
+        },
+        "time":1428653527
+      }
+    }
+  },
+  "sig_p":"1f87014b0c79e35b32c3a6ed8181056c26980cda2fa4b36fbb22c781180a5ad8462586a89c7f1f0842d3a64b65d1417529e37b8188a3ebf948af6bce3a20c8dd63",
+  "sig_user":"tschaul"
+};
+
+var pubkey_tschaul = "03bcd23141e46af2f8bccb0194b53e5df57752a47c263d0d005691cfed4f2511b8";
+
+tschaulPubKey = TwisterCrypto.PubKey.fromHex(pubkey_tschaul);
+
+if( !tschaulPubKey.messageVerify(Bencode.encode(dhtpayload.p), dhtpayload.sig_p) ) {
+  log("ERROR: verify for dht payload failed with the expected pubkey")
+}
+
+if( !tschaulPubKey.messageVerify(Bencode.encode(dhtpayload.p.v.userpost), dhtpayload.p.v.sig_userpost) ) {
+  log("ERROR: verify for post in dht payload failed with the expected pubkey")
 }
 
 //sighex = new Buffer(sig).toString("hex")
